@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Symptom Checker - PulseWatch India Health Guidance</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS & Scripts -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chatbot.js"></script>
+
+    <style>
+        .wizard-step { display: none; }
+        .wizard-step.active { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .symptom-structured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .symptom-pill-btn {
+            background: #FFFFFF;
+            border: 1.5px solid #E5E5E5;
+            color: #111827;
+            padding: 0.85rem 1.1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            text-align: left;
+            width: 100%;
+        }
+
+        .symptom-pill-btn i {
+            color: #E24B4A;
+            font-size: 1.1rem;
+            transition: color 0.2s ease;
+        }
+
+        .symptom-pill-btn:hover {
+            border-color: #E24B4A;
+            background: #FAFAFA;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(226, 75, 74, 0.15);
+        }
+
+        .symptom-pill-btn.selected {
+            background: #E24B4A;
+            color: #FFFFFF;
+            border-color: #E24B4A;
+            box-shadow: 0 4px 14px rgba(226, 75, 74, 0.35);
+        }
+
+        .symptom-pill-btn.selected i {
+            color: #FFFFFF;
+        }
+
+        .radio-option-card {
+            background: #FFFFFF;
+            border: 1.5px solid #E5E5E5;
+            border-radius: 14px;
+            padding: 1.2rem 1.35rem;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .radio-option-card i {
+            color: #E24B4A;
+            font-size: 1.1rem;
+        }
+
+        .radio-option-card:hover, .radio-option-card.selected {
+            border-color: #E24B4A;
+            background: #FCEBEB;
+            color: #791F1F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(226, 75, 74, 0.15);
+        }
+    </style>
+</head>
+<body data-bot-name="SymptomBot">
+
+    <!-- Red Vertical Floating Feedback Tab -->
+    <div class="feedback-tab" onclick="alert('Thank you for your feedback!')">
+        <i class="fa-solid fa-comment-dots"></i> Feedback
+    </div>
+
+    <!-- Standardized Sticky Header Navigation (6 Core Menu Items) -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo-container">
+                <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div>
+                    <div class="logo-title">PulseWatch 🩺</div>
+                    <div class="logo-subtitle">Disease Outbreak Intelligence</div>
+                </div>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="symptom-checker.html" class="nav-link active">Symptom Checker</a></li>
+                <li><a href="map.html" class="nav-link">Outbreak Map</a></li>
+                <li><a href="signals.html" class="nav-link">Live Signals Feed</a></li>
+                <li><a href="forecast.html" class="nav-link">Forecast & Trends</a></li>
+                <li><a href="about.html" class="nav-link">About & Tech</a></li>
+            </ul>
+
+            <div class="header-actions">
+                <button class="btn-signout" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+
+        <section class="card-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <span class="hero-tag"><i class="fa-solid fa-clipboard-check"></i> Guided Assessment Protocol</span>
+                    <h1 class="panel-heading" style="font-size: 2rem;">AI Symptom Checker & Health Guidance</h1>
+                </div>
+                <div style="font-weight: 800; color: #E24B4A; font-size: 1.05rem;" id="stepIndicator">Step 1 of 3</div>
+            </div>
+
+            <!-- Step 1: Select Symptoms -->
+            <div class="wizard-step active" id="step1">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: #111827;">Select the symptoms you are currently experiencing:</h3>
+                
+                <div class="symptom-structured-grid">
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'fever')">
+                        <i class="fa-solid fa-temperature-high"></i> High Fever
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'cough')">
+                        <i class="fa-solid fa-head-side-cough"></i> Cough
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'rash')">
+                        <i class="fa-solid fa-viruses"></i> Skin Rash
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'fatigue')">
+                        <i class="fa-solid fa-battery-quarter"></i> Fatigue & Weakness
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'chills')">
+                        <i class="fa-solid fa-snowflake"></i> Chills & Shivering
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'headache')">
+                        <i class="fa-solid fa-brain"></i> Severe Headache
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'vomiting')">
+                        <i class="fa-solid fa-notes-medical"></i> Vomiting / Nausea
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'diarrhea')">
+                        <i class="fa-solid fa-stretcher"></i> Diarrhea
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'shortness of breath')">
+                        <i class="fa-solid fa-lungs"></i> Shortness of Breath
+                    </button>
+
+                    <button class="symptom-pill-btn" onclick="toggleSymptomPill(this, 'sore throat')">
+                        <i class="fa-solid fa-comment-medical"></i> Sore Throat
+                    </button>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button class="btn btn-primary" onclick="goToStep(2)">Next: Duration →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Duration -->
+            <div class="wizard-step" id="step2">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: #111827;">How long have you experienced these symptoms?</h3>
+                
+                <div class="grid-2" style="margin-top: 1rem;">
+                    <div class="radio-option-card selected" onclick="selectDuration(this, 'today')">
+                        <i class="fa-solid fa-clock"></i> Started Today
+                    </div>
+                    <div class="radio-option-card" onclick="selectDuration(this, '2-3 days')">
+                        <i class="fa-solid fa-calendar-day"></i> 2 to 3 Days
+                    </div>
+                    <div class="radio-option-card" onclick="selectDuration(this, '4-7 days')">
+                        <i class="fa-solid fa-calendar-week"></i> 4 to 7 Days
+                    </div>
+                    <div class="radio-option-card" onclick="selectDuration(this, '1+ week')">
+                        <i class="fa-solid fa-calendar-days"></i> More than 1 Week
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+                    <button class="btn btn-primary" onclick="goToStep(3)">Next: Clinical Details →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Age & Pre-conditions -->
+            <div class="wizard-step" id="step3">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: #111827;">Select patient age group and health profile:</h3>
+                
+                <div class="grid-2" style="margin-top: 1rem;">
+                    <div>
+                        <label style="font-weight: 700; font-size: 0.9rem; color: #374151;">Age Group:</label>
+                        <select style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; border: 1.5px solid #E5E5E5; margin-top: 0.4rem; font-size: 0.95rem; font-weight: 600;" id="ageSelect">
+                            <option value="18-39">Adult (18–39 years)</option>
+                            <option value="40-64">Middle Age (40–64 years)</option>
+                            <option value="65+">Senior Citizen (65+ years)</option>
+                            <option value="0-17">Child / Teen (0–17 years)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-weight: 700; font-size: 0.9rem; color: #374151;">Pre-existing Conditions (optional):</label>
+                        <input type="text" id="preconditionInput" placeholder="e.g. Asthma, Diabetes, Hypertension" style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; border: 1.5px solid #E5E5E5; margin-top: 0.4rem; font-size: 0.95rem;">
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+                    <button class="btn btn-primary" onclick="generateAnalysisResult()"><i class="fa-solid fa-brain"></i> Analyze Symptoms</button>
+                </div>
+            </div>
+
+            <!-- Result Card Container -->
+            <div id="resultCardContainer" style="display: none; margin-top: 2rem;">
+                <div id="resultContent"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Floating Bottom-Right Scoped Chatbot Widget -->
+    <div class="chat-floating-btn" onclick="toggleChatWindow()">
+        <i class="fa-solid fa-stethoscope"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div><i class="fa-solid fa-user-doctor" style="color: #64B5F6;"></i> SymptomBot (Clinical Assistant)</div>
+            <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="toggleChatWindow()"></i>
+        </div>
+
+        <div class="chat-messages" id="chatThread">
+            <div class="msg-bubble msg-bot">
+                Hello! I am <strong>SymptomBot</strong>. Ask me about symptom combinations, fever guidelines, or doctor recommendations!
+            </div>
+        </div>
+
+        <div class="chat-chips">
+            <div class="chip-item" onclick="sendQuickQuery('What does fever + headache mean?')">Fever + Headache</div>
+            <div class="chip-item" onclick="sendQuickQuery('What to do for Dengue?')">Dengue Guidelines</div>
+            <div class="chip-item" onclick="sendQuickQuery('When to see a doctor?')">Emergency Signs</div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Ask SymptomBot..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        const selectedSymptoms = new Set();
+        let selectedDurationStr = "today";
+
+        function toggleSymptomPill(btn, symptom) {
+            if (selectedSymptoms.has(symptom)) {
+                selectedSymptoms.delete(symptom);
+                btn.classList.remove('selected');
+            } else {
+                selectedSymptoms.add(symptom);
+                btn.classList.add('selected');
+            }
+        }
+
+        function selectDuration(card, val) {
+            document.querySelectorAll('.radio-option-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedDurationStr = val;
+        }
+
+        function goToStep(stepNum) {
+            document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${stepNum}`).classList.add('active');
+            document.getElementById('stepIndicator').innerText = `Step ${stepNum} of 3`;
+        }
+
+        function generateAnalysisResult() {
+            const container = document.getElementById('resultCardContainer');
+            const content = document.getElementById('resultContent');
+
+            if (selectedSymptoms.size === 0) {
+                alert('Please select at least one symptom in Step 1.');
+                goToStep(1);
+                return;
+            }
+
+            const symptomsList = Array.from(selectedSymptoms);
+            const hasFever = selectedSymptoms.has('fever');
+            const hasCough = selectedSymptoms.has('cough');
+            const hasBreath = selectedSymptoms.has('shortness of breath');
+            const hasSoreThroat = selectedSymptoms.has('sore throat');
+            const hasDiarrhea = selectedSymptoms.has('diarrhea');
+            const hasVomiting = selectedSymptoms.has('vomiting');
+            const hasHeadache = selectedSymptoms.has('headache');
+            const hasRash = selectedSymptoms.has('rash');
+
+            let dx = {
+                pattern: "Viral Prodrome / General Health Observation",
+                severityBadge: "WATCH (4.5/10)",
+                badgeClass: "watch",
+                icdCode: "ICD-10: R53.83",
+                location: "General Indian Surveillance Zone",
+                matchedSignals: 1,
+                icmrRec: "Get adequate rest, maintain oral hydration, monitor body temperature twice daily, and consult a medical practitioner if fever or cough develops."
+            };
+
+            if (hasFever && hasHeadache && (hasVomiting || hasBreath)) {
+                dx = {
+                    pattern: "Acute Viral Encephalitis / Nipah Surveillance Alert",
+                    severityBadge: "CRITICAL EMERGENCY (9.8/10)",
+                    badgeClass: "emergency",
+                    icdCode: "ICD-10: A83.8",
+                    location: "Kozhikode & Malappuram, Kerala",
+                    matchedSignals: 42,
+                    icmrRec: "Immediate isolation required. Contact District Surveillance Officer (DSO) or call 1056 immediately for specialized viral diagnostic testing."
+                };
+            } else if (hasCough || hasBreath || hasSoreThroat) {
+                if (hasBreath) {
+                    dx = {
+                        pattern: "Severe Acute Respiratory Infection (SARI) Risk",
+                        severityBadge: "EMERGENCY (9.0/10)",
+                        badgeClass: "emergency",
+                        icdCode: "ICD-10: J09.X2",
+                        location: "Mumbai, Maharashtra & Delhi NCR",
+                        matchedSignals: 22,
+                        icmrRec: "Isolate in a ventilated room, wear an N95 mask, measure SpO2 oxygen levels every 4 hours, and seek urgent pulmonology care if SpO2 drops below 94%."
+                    };
+                } else {
+                    dx = {
+                        pattern: "Acute Upper Respiratory Tract Infection (URTI)",
+                        severityBadge: "WARNING (6.2/10)",
+                        badgeClass: "warning",
+                        icdCode: "ICD-10: J06.9",
+                        location: "Delhi NCR & Northern Region",
+                        matchedSignals: 15,
+                        icmrRec: "Steam inhalation twice daily, warm saline gargles, adequate hydration, and monitor for shortness of breath or persistent chest discomfort."
+                    };
+                }
+            } else if (hasDiarrhea || hasVomiting) {
+                dx = {
+                    pattern: "Acute Gastroenteritis / Waterborne Enteric Infection",
+                    severityBadge: "WARNING (7.4/10)",
+                    badgeClass: "warning",
+                    icdCode: "ICD-10: A09.9",
+                    location: "Kolkata, West Bengal & Coastal Regions",
+                    matchedSignals: 18,
+                    icmrRec: "Administer Zinc supplements and Oral Rehydration Solution (ORS) after every loose stool. Boil drinking water for 10 minutes, avoid street food, and visit a health center if lethargy occurs."
+                };
+            } else if (hasFever && (hasRash || hasHeadache)) {
+                dx = {
+                    pattern: "Febrile / Dengue Vector Transmission Risk",
+                    severityBadge: "EMERGENCY (8.5/10)",
+                    badgeClass: "emergency",
+                    icdCode: "ICD-10: A90",
+                    location: "Bengaluru, Karnataka & Tamil Nadu",
+                    matchedSignals: 28,
+                    icmrRec: "Drink plenty of ORS / coconut water, monitor daily platelet count via blood test (CBC), strictly avoid NSAIDs like Aspirin or Ibuprofen, and seek urgent hospital care if abdominal pain develops."
+                };
+            }
+
+            container.style.display = 'block';
+            content.innerHTML = `
+                <div style="background: #FFFFFF; border: 2px solid #E24B4A; border-radius: 16px; padding: 1.75rem; box-shadow: var(--shadow-md);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <span class="badge-alert ${dx.badgeClass}">${dx.severityBadge}</span>
+                        <span style="font-size: 0.85rem; color: #6B7280; font-weight: 700;">Matched ${dx.matchedSignals} Ingested Indian Outbreak Signals</span>
+                    </div>
+
+                    <h3 style="font-size: 1.3rem; font-weight: 800; color: #111827; margin: 0.85rem 0 0.4rem 0;">Matched Outbreak Pattern: ${dx.pattern}</h3>
+                    <div style="font-size: 0.82rem; color: #E24B4A; font-weight: 800; margin-bottom: 0.75rem;">${dx.icdCode} • Surveillance Zone: ${dx.location}</div>
+                    
+                    <p style="font-size: 0.92rem; color: #4B5563; line-height: 1.6;">
+                        Selected symptoms <strong>(${symptomsList.join(', ')})</strong> with duration <strong>(${selectedDurationStr})</strong> match active clinical outbreak patterns in ${dx.location}.
+                    </p>
+
+                    <div style="background: #FCEBEB; padding: 1.1rem; border-radius: 12px; margin: 1.25rem 0; border: 1px solid #f0d0d0; color: #791F1F;">
+                        <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.95rem;">ICMR Clinical Recommendation:</strong>
+                        ${dx.icmrRec}
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                        <a href="map.html" class="btn btn-primary"><i class="fa-solid fa-map-location-dot"></i> View Outbreak Map</a>
+                    </div>
+                </div>
+            `;
+
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <span>© 2026 PulseWatch India. All rights reserved. S.A. Engineering College AI&DS.</span>
+            <span>Symptomate-Inspired Guided Assessment & SymptomBot AI</span>
+        </div>
+    </footer>
+
+</body>
+</html>

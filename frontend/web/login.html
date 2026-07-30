@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - PulseWatch India</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS & Scripts -->
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth.js"></script>
+
+    <style>
+        body {
+            background: #FAFAFA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .simple-login-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E5E5;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            padding: 2.25rem 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1.5px solid #E5E5E5;
+            outline: none;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-field:focus {
+            border-color: #E24B4A;
+            box-shadow: 0 0 0 3px rgba(226, 75, 74, 0.12);
+        }
+
+        .error-msg {
+            color: #D32F2F;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: none;
+            margin-top: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="simple-login-card">
+        <!-- Brand Header (Clean without language dropdown) -->
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <div style="width: 42px; height: 42px; background: #E24B4A; color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800;"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div>
+                    <strong style="font-size: 1.25rem; color: #111827; display: block; line-height: 1.2;">PulseWatch 🩺</strong>
+                    <span style="font-size: 0.72rem; color: #6B7280; font-weight: 600;">Disease Outbreak Intelligence</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 0.2rem;">
+            <h1 style="font-size: 1.45rem; font-weight: 800; color: #111827;">Sign In</h1>
+            <p style="font-size: 0.88rem; color: #6B7280; margin-top: 0.25rem;">Enter your official credentials to access the platform.</p>
+        </div>
+
+        <!-- Form -->
+        <form onsubmit="handleStrictLogin(event)" style="display: flex; flex-direction: column; gap: 1.1rem;">
+            
+            <!-- Email Input Field -->
+            <div class="input-group">
+                <label for="userEmail" style="font-size: 0.85rem; font-weight: 700; color: #374151;">Email Address</label>
+                <input type="email" id="userEmail" class="input-field" placeholder="username@pulsewatch.io" value="" required pattern="^[a-zA-Z0-9._%+-]+@pulsewatch\.io$">
+                <span class="error-msg" id="emailError">⚠️ Email must end with <strong>@pulsewatch.io</strong></span>
+            </div>
+
+            <!-- Password Input Field -->
+            <div class="input-group">
+                <label for="userPassword" style="font-size: 0.85rem; font-weight: 700; color: #374151;">Numeric Password (5-8 Digits)</label>
+                <input type="password" id="userPassword" class="input-field" placeholder="5 to 8 numeric digits" value="" required pattern="^[0-9]{5,8}$" maxlength="8" minlength="5">
+                <span class="error-msg" id="passError">⚠️ Password must be <strong>5 to 8 numeric digits</strong> (0-9)</span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem; font-size: 0.95rem; margin-top: 0.4rem; border-radius: 20px;">
+                Sign In →
+            </button>
+
+        </form>
+    </div>
+
+    <script>
+        function handleStrictLogin(e) {
+            e.preventDefault();
+            
+            const emailInput = document.getElementById('userEmail');
+            const passInput = document.getElementById('userPassword');
+            const emailError = document.getElementById('emailError');
+            const passError = document.getElementById('passError');
+
+            const email = emailInput.value.trim();
+            const password = passInput.value.trim();
+
+            let isValid = true;
+
+            if (!/^[a-zA-Z0-9._%+-]+@pulsewatch\.io$/i.test(email)) {
+                emailError.style.display = 'block';
+                emailInput.style.borderColor = '#D32F2F';
+                isValid = false;
+            } else {
+                emailError.style.display = 'none';
+                emailInput.style.borderColor = '#E5E5E5';
+            }
+
+            if (!/^[0-9]{5,8}$/.test(password)) {
+                passError.style.display = 'block';
+                passInput.style.borderColor = '#D32F2F';
+                isValid = false;
+            } else {
+                passError.style.display = 'none';
+                passInput.style.borderColor = '#E5E5E5';
+            }
+
+            if (!isValid) return;
+
+            loginUser('Official', email);
+        }
+    </script>
+</body>
+</html>

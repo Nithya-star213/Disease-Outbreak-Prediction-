@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Signals Feed - PulseWatch India Health Ingestion Stream</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS & Scripts -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chatbot.js"></script>
+
+    <style>
+        .filter-chip-btn {
+            background: #FFFFFF;
+            border: 1.5px solid #E5E5E5;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-chip-btn:hover {
+            border-color: #E24B4A;
+            color: #E24B4A;
+            background: #FAFAFA;
+        }
+
+        .filter-chip-btn.active {
+            background: #E24B4A;
+            color: #FFFFFF;
+            border-color: #E24B4A;
+            box-shadow: 0 4px 10px rgba(226, 75, 74, 0.25);
+        }
+
+        .filter-chip-btn.active i {
+            color: #FFFFFF;
+        }
+
+        .filter-chip-btn i {
+            color: #E24B4A;
+        }
+
+        .signal-item-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E5E5;
+            border-radius: 16px;
+            padding: 1.35rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s ease;
+        }
+
+        .signal-item-card:hover {
+            border-color: #E24B4A;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .pulse-dot {
+            width: 9px;
+            height: 9px;
+            background: #2E7D32;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7);
+            animation: pulseGreen 1.8s infinite;
+        }
+
+        @keyframes pulseGreen {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 125, 50, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+        }
+    </style>
+</head>
+<body data-bot-name="FeedBot">
+
+    <!-- Red Vertical Floating Feedback Tab -->
+    <div class="feedback-tab" onclick="alert('Thank you for your feedback!')">
+        <i class="fa-solid fa-comment-dots"></i> Feedback
+    </div>
+
+    <!-- Standardized Sticky Header Navigation (6 Core Menu Items) -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo-container">
+                <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div>
+                    <div class="logo-title">PulseWatch 🩺</div>
+                    <div class="logo-subtitle">Disease Outbreak Intelligence</div>
+                </div>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="symptom-checker.html" class="nav-link">Symptom Checker</a></li>
+                <li><a href="map.html" class="nav-link">Outbreak Map</a></li>
+                <li><a href="signals.html" class="nav-link active">Live Signals Feed</a></li>
+                <li><a href="forecast.html" class="nav-link">Forecast & Trends</a></li>
+                <li><a href="about.html" class="nav-link">About & Tech</a></li>
+            </ul>
+
+            <div class="header-actions">
+                <button class="btn-signout" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+
+        <!-- Title Bar & Stream Control Buttons -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span class="hero-tag"><i class="fa-solid fa-server"></i> Kafka Stream Ingestion Broker</span>
+                <h1 class="panel-heading" style="font-size: 2.2rem;">Real-Time Disease Signals Feed</h1>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <button class="btn btn-secondary" id="pauseStreamBtn" onclick="toggleStreamPause()">
+                    <span class="pulse-dot" id="pulseIndicator"></span> <span id="streamBtnText">Pause Stream</span>
+                </button>
+
+                <button class="btn btn-primary" onclick="exportSignalsCSV()">
+                    <i class="fa-solid fa-download"></i> Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- 4 Metrics Overview Cards -->
+        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 2rem; font-weight: 800; color: #1E88E5;" id="metricCount">118</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Signals Ingested Today</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 2rem; font-weight: 800; color: #E24B4A;">High Fever</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Top Symptom Tag</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 2rem; font-weight: 800; color: #D32F2F;">Kozhikode</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Top Active Hotspot</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 2rem; font-weight: 800; color: #2E7D32;">91.4%</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Avg BioBERT Score</div>
+            </div>
+        </section>
+
+        <!-- Search Bar (Triggers ONLY on Enter Key or Search Button), Source Selector & Symptom Chips -->
+        <section class="card-panel" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                <div style="flex: 1; position: relative; min-width: 280px; display: flex; gap: 0.5rem;">
+                    <div style="position: relative; flex: 1;">
+                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9CA3AF;"></i>
+                        <input type="text" id="searchInput" placeholder="Type keyword (e.g. fever, Dengue, Kerala) and press ENTER..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border-radius: 12px; border: 1.5px solid #E5E5E5; font-size: 0.95rem; outline: none; font-weight: 600;" onkeypress="if(event.key==='Enter') executeSearch()">
+                    </div>
+                    <button class="btn btn-primary" onclick="executeSearch()" style="padding: 0.75rem 1.5rem; border-radius: 12px;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                </div>
+
+                <select id="sourceSelect" style="padding: 0.75rem 1rem; border-radius: 12px; border: 1.5px solid #E5E5E5; font-size: 0.92rem; font-weight: 700; outline: none; background: #FFFFFF; cursor: pointer;" onchange="executeSearch()">
+                    <option value="all">All Data Sources (WHO, NewsAPI, Twitter)</option>
+                    <option value="WHO">WHO RSS Feed</option>
+                    <option value="NewsAPI">NewsAPI India</option>
+                    <option value="Twitter">Twitter / X Stream</option>
+                    <option value="Google">Google Trends</option>
+                </select>
+            </div>
+
+            <!-- Professional Symptom Filter Chips -->
+            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                <span style="font-weight: 800; font-size: 0.88rem; color: #111827; margin-right: 0.4rem;">Symptom Filter:</span>
+                
+                <button class="filter-chip-btn active" onclick="setChipFilter('all', this)">All</button>
+                
+                <button class="filter-chip-btn" onclick="setChipFilter('fever', this)">
+                    <i class="fa-solid fa-temperature-high"></i> Fever
+                </button>
+
+                <button class="filter-chip-btn" onclick="setChipFilter('cough', this)">
+                    <i class="fa-solid fa-head-side-cough"></i> Cough
+                </button>
+
+                <button class="filter-chip-btn" onclick="setChipFilter('rash', this)">
+                    <i class="fa-solid fa-viruses"></i> Skin Rash
+                </button>
+
+                <button class="filter-chip-btn" onclick="setChipFilter('headache', this)">
+                    <i class="fa-solid fa-brain"></i> Headache
+                </button>
+
+                <button class="filter-chip-btn" onclick="setChipFilter('hemorrhage', this)">
+                    <i class="fa-solid fa-droplet"></i> Hemorrhage
+                </button>
+            </div>
+        </section>
+
+        <!-- Live Signal Cards Container -->
+        <section style="display: flex; flex-direction: column; gap: 1rem;" id="signalsFeedContainer">
+            <!-- Dynamic signal cards injected here -->
+        </section>
+
+    </div>
+
+    <!-- Floating Bottom-Right Scoped Chatbot Widget -->
+    <div class="chat-floating-btn" onclick="toggleChatWindow()">
+        <i class="fa-solid fa-rss"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div><i class="fa-solid fa-satellite-dish" style="color: #64B5F6;"></i> FeedBot (Signals Assistant)</div>
+            <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="toggleChatWindow()"></i>
+        </div>
+
+        <div class="chat-messages" id="chatThread">
+            <div class="msg-bubble msg-bot">
+                Hello! I am <strong>FeedBot</strong>. Ask me about live Kafka stream ingestion rates, signal filtering, or CSV export options!
+            </div>
+        </div>
+
+        <div class="chat-chips">
+            <div class="chip-item" onclick="sendQuickQuery('What is Kafka stream ingestion rate?')">Kafka Stream Rate</div>
+            <div class="chip-item" onclick="sendQuickQuery('How to filter ingested signals?')">Filter Signals</div>
+            <div class="chip-item" onclick="sendQuickQuery('How to export signals CSV?')">Export Signals CSV</div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Ask FeedBot..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let allSignalsData = [];
+        let isStreamPaused = false;
+        let activeSymptomFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadLiveSignalsFeed();
+        });
+
+        async function loadLiveSignalsFeed() {
+            allSignalsData = await fetchLiveSignals();
+            renderSignalsList(allSignalsData);
+        }
+
+        function renderSignalsList(signals) {
+            const container = document.getElementById('signalsFeedContainer');
+            container.innerHTML = '';
+
+            if (!signals || signals.length === 0) {
+                container.innerHTML = `
+                    <div class="card-panel" style="text-align: center; color: #6B7280; padding: 3rem 1.5rem;">
+                        <i class="fa-solid fa-inbox" style="font-size: 2rem; color: #9CA3AF; margin-bottom: 0.5rem; display: block;"></i>
+                        No ingested signals matched your search criteria. Try searching for "fever", "dengue", or "kerala" and select "All Data Sources".
+                    </div>
+                `;
+                return;
+            }
+
+            signals.forEach(s => {
+                const alertLevel = (s.alert_level || 'WARNING').toUpperCase();
+                const badgeClass = alertLevel === 'EMERGENCY' ? 'emergency' : alertLevel === 'WARNING' ? 'warning' : 'watch';
+                const confidence = s.confidence || 88;
+
+                const card = document.createElement('div');
+                card.className = 'signal-item-card';
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <i class="fa-solid ${s.icon || 'fa-rss'}" style="color: #E24B4A; font-size: 1.1rem;"></i>
+                            <strong style="font-size: 0.95rem; color: #111827;">${s.source}</strong>
+                            <span style="font-size: 0.8rem; color: #6B7280;">• ${s.timestamp}</span>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <span style="font-size: 0.8rem; font-weight: 700; color: #2E7D32; background: #E8F5E9; padding: 0.25rem 0.65rem; border-radius: 12px;">
+                                ${confidence}% BioBERT Confidence
+                            </span>
+                            <span class="badge-alert ${badgeClass}">${alertLevel}</span>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 0.96rem; color: #374151; line-height: 1.65; font-weight: 500;">${s.text}</p>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F3F4F6; padding-top: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #6B7280; font-weight: 600;">
+                            <i class="fa-solid fa-location-dot" style="color: #E24B4A;"></i> ${s.location}
+                        </div>
+
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #E24B4A; background: #FCEBEB; padding: 0.25rem 0.75rem; border-radius: 12px; text-transform: uppercase;">
+                            Tag: ${s.symptom}
+                        </span>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function setChipFilter(symptom, btn) {
+            document.querySelectorAll('.filter-chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeSymptomFilter = symptom;
+            executeSearch();
+        }
+
+        // EXECUTED ONLY WHEN ENTER KEY IS PRESSED OR SEARCH BUTTON IS CLICKED
+        function executeSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedSource = document.getElementById('sourceSelect').value.toLowerCase();
+
+            const filtered = allSignalsData.filter(s => {
+                const textMatch = !query || 
+                    s.text.toLowerCase().includes(query) || 
+                    s.location.toLowerCase().includes(query) || 
+                    s.symptom.toLowerCase().includes(query) ||
+                    s.source.toLowerCase().includes(query);
+
+                const sourceMatch = selectedSource === 'all' || s.source.toLowerCase().includes(selectedSource);
+                const symptomMatch = activeSymptomFilter === 'all' || s.symptom.toLowerCase().includes(activeSymptomFilter);
+
+                return textMatch && sourceMatch && symptomMatch;
+            });
+
+            renderSignalsList(filtered);
+        }
+
+        function toggleStreamPause() {
+            isStreamPaused = !isStreamPaused;
+            const btnText = document.getElementById('streamBtnText');
+            const dot = document.getElementById('pulseIndicator');
+
+            if (isStreamPaused) {
+                btnText.innerText = 'Resume Stream';
+                dot.style.background = '#F9A825';
+                dot.style.animation = 'none';
+            } else {
+                btnText.innerText = 'Pause Stream';
+                dot.style.background = '#2E7D32';
+                dot.style.animation = 'pulseGreen 1.8s infinite';
+            }
+        }
+
+        function exportSignalsCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Source,Location,Symptom,AlertLevel,Confidence,Timestamp,Text\n";
+            allSignalsData.forEach(s => {
+                const cleanText = s.text.replace(/"/g, '""');
+                csvContent += `"${s.id}","${s.source}","${s.location}","${s.symptom}","${s.alert_level}","${s.confidence}%","${s.timestamp}","${cleanText}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "PulseWatch_Live_Disease_Signals.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <span>© 2026 PulseWatch India. All rights reserved. S.A. Engineering College AI&DS.</span>
+            <span>Kafka Ingestion Stream & FeedBot AI</span>
+        </div>
+    </footer>
+
+</body>
+</html>

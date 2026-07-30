@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outbreak Map - PulseWatch India Geospatial Surveillance</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome & Leaflet CSS/JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Custom CSS & Scripts -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chatbot.js"></script>
+
+    <style>
+        .map-wrapper-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.5rem;
+            min-height: 640px;
+        }
+
+        @media (max-width: 1024px) {
+            .map-wrapper-grid { grid-template-columns: 1fr; }
+        }
+
+        #leafletMapContainer {
+            width: 100%;
+            height: 100%;
+            min-height: 580px;
+            border-radius: 20px;
+            border: 1px solid #E5E5E5;
+            z-index: 1;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            background: #F4F7F9;
+        }
+
+        .cluster-list-sidebar {
+            background: #FFFFFF;
+            border: 1px solid #E5E5E5;
+            border-radius: 20px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 640px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cluster-item-card {
+            background: #FFFFFF;
+            border: 1.5px solid #E5E5E5;
+            border-radius: 14px;
+            padding: 1.1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .cluster-item-card:hover, .cluster-item-card.active {
+            border-color: #E24B4A;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(226, 75, 74, 0.12);
+        }
+    </style>
+</head>
+<body data-bot-name="MapBot">
+
+    <!-- Red Vertical Floating Feedback Tab -->
+    <div class="feedback-tab" onclick="alert('Feedback recorded for Outbreak Map!')">
+        <i class="fa-solid fa-comment-dots"></i> Feedback
+    </div>
+
+    <!-- Standardized Sticky Header Navigation (6 Core Menu Items) -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo-container">
+                <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div>
+                    <div class="logo-title">PulseWatch 🩺</div>
+                    <div class="logo-subtitle">Disease Outbreak Intelligence</div>
+                </div>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="symptom-checker.html" class="nav-link">Symptom Checker</a></li>
+                <li><a href="map.html" class="nav-link active">Outbreak Map</a></li>
+                <li><a href="signals.html" class="nav-link">Live Signals Feed</a></li>
+                <li><a href="forecast.html" class="nav-link">Forecast & Trends</a></li>
+                <li><a href="about.html" class="nav-link">About & Tech</a></li>
+            </ul>
+
+            <div class="header-actions">
+                <button class="btn-signout" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+
+        <!-- Page Header & Stats Summary Layer -->
+        <div>
+            <span class="hero-tag"><i class="fa-solid fa-map-location-dot"></i> DBSCAN Geospatial Clustering Engine</span>
+            <h1 class="panel-heading" style="font-size: 2.2rem;">India Outbreak Surveillance Map</h1>
+            <p class="panel-subheading">Focused strictly on 28 Indian States & 8 Union Territories with 50km DBSCAN cluster radius detection.</p>
+        </div>
+
+        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #D32F2F;">5 Active</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Monitored Hotspots</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #E24B4A;">50 km</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">DBSCAN Cluster Radius</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #2E7D32;">28 States</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Coverage Scope</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #1E88E5;">118 Signals</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Ingested in 24 Hours</div>
+            </div>
+        </section>
+
+        <!-- Original Leaflet Interactive Map & Cluster List Split View -->
+        <div class="map-wrapper-grid">
+            <div id="leafletMapContainer"></div>
+
+            <div class="cluster-list-sidebar">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E5E5; padding-bottom: 0.75rem;">
+                    <h3 style="font-size: 1.1rem; font-weight: 800; color: #111827;">Indian Outbreak Hotspots</h3>
+                    <span class="badge-alert emergency">Live Stream</span>
+                </div>
+
+                <div id="clustersListArea" style="display: flex; flex-direction: column; gap: 0.85rem;">
+                    <!-- Cluster cards rendered dynamically without any undefined text -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Bottom-Right Scoped Chatbot Widget -->
+    <div class="chat-floating-btn" onclick="toggleChatWindow()">
+        <i class="fa-solid fa-map-location-dot"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div><i class="fa-solid fa-earth-asia" style="color: #64B5F6;"></i> MapBot (Geospatial Assistant)</div>
+            <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="toggleChatWindow()"></i>
+        </div>
+
+        <div class="chat-messages" id="chatThread">
+            <div class="msg-bubble msg-bot">
+                Hello! I am <strong>MapBot</strong>. Ask me about cluster coordinates, high-risk Indian states, or Leaflet map layers!
+            </div>
+        </div>
+
+        <div class="chat-chips">
+            <div class="chip-item" onclick="sendQuickQuery('Show Kerala Nipah Cluster')">Kerala Cluster</div>
+            <div class="chip-item" onclick="sendQuickQuery('Show Bengaluru Dengue Cluster')">Bengaluru Cluster</div>
+            <div class="chip-item" onclick="sendQuickQuery('How DBSCAN clustering works?')">DBSCAN Engine</div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Ask MapBot..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let leafletMap = null;
+        let markersGroup = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initLeafletOriginalMap();
+            await loadMapClusters();
+        });
+
+        function initLeafletOriginalMap() {
+            const indiaSouthWest = L.latLng(6.8, 68.0);
+            const indiaNorthEast = L.latLng(35.5, 97.5);
+            const indiaBounds = L.latLngBounds(indiaSouthWest, indiaNorthEast);
+
+            leafletMap = L.map('leafletMapContainer', {
+                center: [21.5, 78.5],
+                zoom: 5,
+                minZoom: 4,
+                maxZoom: 9,
+                maxBounds: indiaBounds,
+                maxBoundsViscosity: 0.8,
+                zoomControl: true
+            });
+
+            // Clean CartoDB Positron Light Tiles
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap contributors © CARTO | PulseWatch India',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(leafletMap);
+
+            leafletMap.fitBounds(indiaBounds);
+        }
+
+        async function loadMapClusters() {
+            const clusters = await fetchClusters();
+            const listArea = document.getElementById('clustersListArea');
+            listArea.innerHTML = '';
+
+            clusters.forEach((c, idx) => {
+                const alertLevel = (c.alert_level || c.severity || 'WARNING').toUpperCase();
+                const symptom = c.top_symptom || c.primary_symptom || 'Fever';
+                const score = c.risk_score || c.z_score || 7.0;
+                const signals = c.signal_count || 20;
+
+                const color = alertLevel === 'EMERGENCY' ? '#D32F2F' : alertLevel === 'WARNING' ? '#F9A825' : '#2E7D32';
+                const badgeClass = alertLevel === 'EMERGENCY' ? 'emergency' : alertLevel === 'WARNING' ? 'warning' : 'watch';
+
+                // Render circle marker on Leaflet map
+                const marker = L.circleMarker([c.lat, c.lng], {
+                    radius: Math.max(14, signals / 2),
+                    fillColor: color,
+                    color: color,
+                    weight: 2.5,
+                    opacity: 1.0,
+                    fillOpacity: 0.45
+                }).addTo(leafletMap);
+
+                marker.bindPopup(`
+                    <div style="font-family: 'Plus Jakarta Sans', sans-serif; padding: 4px;">
+                        <strong style="font-size: 1rem; color: #111827;">${c.location}</strong>
+                        <div style="margin-top: 4px; font-size: 0.88rem; color: #E24B4A; font-weight: 800;">Primary Symptom: ${symptom}</div>
+                        <div style="font-size: 0.8rem; color: #4B5563; margin-top: 2px;">Ingested Signals: <strong>${signals}</strong> • Risk Score: <strong>${score} / 10</strong></div>
+                    </div>
+                `);
+
+                markersGroup.push(marker);
+
+                // Render sidebar list item card cleanly without any 'undefined' strings
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `cluster-item-card ${idx === 0 ? 'active' : ''}`;
+                itemDiv.id = `card-${c.id}`;
+                itemDiv.onclick = () => focusClusterOnMap(c.lat, c.lng, marker, c.id);
+
+                itemDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="font-size: 1.05rem; color: #111827;">${c.location}</strong>
+                        <span class="badge-alert ${badgeClass}">${alertLevel}</span>
+                    </div>
+                    <div style="font-size: 0.88rem; color: #E24B4A; font-weight: 700; margin-top: 0.35rem;">
+                        Primary Symptom: <span style="color: #111827; font-weight: 600;">${symptom}</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #6B7280; margin-top: 0.25rem;">
+                        Signals: <strong>${signals} Ingested</strong> | Risk Score: <strong>${score} / 10</strong>
+                    </div>
+                `;
+
+                listArea.appendChild(itemDiv);
+            });
+        }
+
+        function focusClusterOnMap(lat, lng, marker, clusterId) {
+            document.querySelectorAll('.cluster-item-card').forEach(card => card.classList.remove('active'));
+            const selectedCard = document.getElementById(`card-${clusterId}`);
+            if (selectedCard) selectedCard.classList.add('active');
+
+            leafletMap.flyTo([lat, lng], 7, { duration: 1.5 });
+            marker.openPopup();
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <span>© 2026 PulseWatch India. All rights reserved. S.A. Engineering College AI&DS.</span>
+            <span>DBSCAN Geospatial Map & MapBot AI</span>
+        </div>
+    </footer>
+
+</body>
+</html>

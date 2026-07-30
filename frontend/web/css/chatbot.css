@@ -1,0 +1,186 @@
+/* PulseWatch India - Red Theme Chatbot & Premium Button Stylesheet */
+
+/* Floating Chatbot Launch Button (Medical Red Theme) */
+.chat-floating-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #E24B4A, #A32D2D);
+    color: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 6px 20px rgba(226, 75, 74, 0.4);
+    cursor: pointer;
+    z-index: 3000;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-floating-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(226, 75, 74, 0.55);
+}
+
+/* Chatbot Slide-Up Window Panel */
+.chat-window {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    width: 400px;
+    max-width: calc(100vw - 32px);
+    height: 540px;
+    max-height: calc(100vh - 120px);
+    background: #FFFFFF;
+    border-radius: 24px;
+    border: 1px solid #F0D0D0;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+    display: none;
+    flex-direction: column;
+    z-index: 3000;
+    overflow: hidden;
+    animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat-window.active {
+    display: flex;
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Chat Header (Medical Red) */
+.chat-header {
+    background: linear-gradient(135deg, #E24B4A, #791F1F);
+    color: #FFFFFF;
+    padding: 1.1rem 1.25rem;
+    font-weight: 800;
+    font-size: 1.05rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chat-header i {
+    font-size: 1.1rem;
+}
+
+/* Messages Thread */
+.chat-messages {
+    flex: 1;
+    padding: 1.25rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    background: #FAFAFA;
+}
+
+.msg-bubble {
+    max-width: 85%;
+    padding: 0.85rem 1.1rem;
+    border-radius: 18px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    word-break: break-word;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.msg-bot {
+    background: #FFFFFF;
+    color: #111827;
+    border-bottom-left-radius: 4px;
+    border: 1px solid #E5E5E5;
+    align-self: flex-start;
+}
+
+.msg-user {
+    background: #E24B4A;
+    color: #FFFFFF;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+    font-weight: 500;
+}
+
+/* Quick Suggestion Chips */
+.chat-chips {
+    padding: 0.6rem 1rem;
+    background: #FFFFFF;
+    border-top: 1px solid #E5E5E5;
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.chip-item {
+    background: #FCEBEB;
+    color: #E24B4A;
+    border: 1px solid #F0D0D0;
+    padding: 0.4rem 0.85rem;
+    border-radius: 16px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.chip-item:hover {
+    background: #E24B4A;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(226, 75, 74, 0.3);
+}
+
+/* Input Bar */
+.chat-input-bar {
+    padding: 0.75rem 1rem;
+    background: #FFFFFF;
+    border-top: 1px solid #E5E5E5;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.chat-input-bar input {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border-radius: 20px;
+    border: 1.5px solid #E5E5E5;
+    outline: none;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.chat-input-bar input:focus {
+    border-color: #E24B4A;
+}
+
+.chat-input-bar button {
+    width: 38px;
+    height: 38px;
+    background: #E24B4A;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(226, 75, 74, 0.3);
+    transition: all 0.2s ease;
+}
+
+.chat-input-bar button:hover {
+    background: #A32D2D;
+    transform: scale(1.08);
+    box-shadow: 0 5px 12px rgba(226, 75, 74, 0.45);
+}

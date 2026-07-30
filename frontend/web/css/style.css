@@ -1,0 +1,450 @@
+/* PulseWatch India - Enterprise Medical Light Theme & Layout CSS */
+
+:root {
+    --bg-page: #FAFAFA;
+    --bg-card: #FFFFFF;
+    --bg-subtle: #F0F4F8;
+    --border-light: #E5E5E5;
+    --border-accent: #E24B4A;
+    
+    --primary-red: #E24B4A;
+    --primary-red-hover: #A32D2D;
+    --primary-red-light: #FCEBEB;
+    
+    --alert-emergency: #D32F2F;
+    --alert-emergency-bg: #FFEBEE;
+    --alert-warning: #F9A825;
+    --alert-warning-bg: #FFF8E1;
+    --alert-watch: #2E7D32;
+    --alert-watch-bg: #E8F5E9;
+    
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6B7280;
+    --text-white: #FFFFFF;
+    
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-md: 0 6px 16px rgba(0,0,0,0.07);
+    --shadow-lg: 0 12px 30px rgba(0,0,0,0.1);
+    
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6, .logo-title, .panel-heading {
+    font-family: var(--font-heading);
+}
+
+/* 100% Structured Single-Line Header Navigation */
+header {
+    background: #FFFFFF;
+    color: var(--text-primary);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-bottom: 1px solid var(--border-light);
+    width: 100%;
+}
+
+.header-container {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 0.7rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.logo-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #E24B4A, #A32D2D);
+    color: #FFFFFF;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(226, 75, 74, 0.3);
+    flex-shrink: 0;
+}
+
+.logo-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: #111827;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.logo-subtitle {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    list-style: none;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #374151;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 20px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1.2;
+}
+
+.nav-link:hover {
+    color: #E24B4A;
+    background: #FCEBEB;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(226, 75, 74, 0.12);
+}
+
+.nav-link.active {
+    color: #FFFFFF;
+    background: #E24B4A;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(226, 75, 74, 0.3);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* CLEAN WHITE PILL SIGN OUT BUTTON (EXACT MATCH TO REFERENCE IMAGE) */
+.btn-signout {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    border: 1px solid #E5E5E5 !important;
+    padding: 0.45rem 0.9rem !important;
+    border-radius: 20px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    white-space: nowrap !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0 !important;
+    text-decoration: none !important;
+}
+
+.btn-signout:hover {
+    background: #FAFAFA !important;
+    border-color: #E24B4A !important;
+    color: #E24B4A !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(226, 75, 74, 0.15) !important;
+}
+
+.btn-signout i {
+    color: #111827 !important;
+    transition: color 0.2s ease !important;
+}
+
+.btn-signout:hover i {
+    color: #E24B4A !important;
+}
+
+/* Hero Section (#111827) */
+.hero-container {
+    background: #111827;
+    color: #FFFFFF;
+    padding: 4rem 2rem;
+    text-align: center;
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+}
+
+.hero-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    max-width: 820px;
+    margin: 0 auto 2rem auto;
+    line-height: 1.35;
+    letter-spacing: -0.4px;
+}
+
+.textarea-wrapper {
+    max-width: 820px;
+    margin: 0 auto 1.5rem auto;
+    position: relative;
+}
+
+.patient-textarea {
+    width: 100%;
+    height: 150px;
+    background: #FFFFFF;
+    color: #111827;
+    border: 2px solid #E5E5E5;
+    border-radius: 20px;
+    padding: 1.25rem;
+    font-size: 1.05rem;
+    outline: none;
+    font-family: inherit;
+    resize: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.patient-textarea::placeholder {
+    color: #9CA3AF;
+}
+
+.search-btn {
+    background: linear-gradient(135deg, #E24B4A, #A32D2D);
+    color: #FFFFFF;
+    border: none;
+    padding: 0.85rem 2.5rem;
+    border-radius: 24px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    box-shadow: 0 4px 14px rgba(226, 75, 74, 0.35);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-btn:hover {
+    background: linear-gradient(135deg, #A32D2D, #791F1F);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(226, 75, 74, 0.5);
+}
+
+.quickstart-btn {
+    background: rgba(255,255,255,0.12);
+    color: #FFFFFF;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 0.55rem 1.4rem;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.25s ease;
+}
+
+.quickstart-btn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255,255,255,0.2);
+}
+
+/* General Buttons System */
+.btn {
+    padding: 0.65rem 1.4rem;
+    border-radius: 24px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #E24B4A, #A32D2D);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(226, 75, 74, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #A32D2D, #791F1F);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(226, 75, 74, 0.45);
+}
+
+.btn-secondary {
+    background: #FFFFFF;
+    color: #111827;
+    border-color: #E5E5E5;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.btn-secondary:hover {
+    background: #FAFAFA;
+    border-color: #E24B4A;
+    color: #E24B4A;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+/* Red Vertical Floating Feedback Tab */
+.feedback-tab {
+    position: fixed;
+    right: 0;
+    top: 40%;
+    background: linear-gradient(180deg, #E24B4A, #A32D2D);
+    color: #FFFFFF;
+    padding: 0.85rem 0.55rem;
+    border-radius: 10px 0 0 10px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: -4px 0 15px rgba(226, 75, 74, 0.35);
+    z-index: 2000;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.feedback-tab:hover {
+    background: linear-gradient(180deg, #A32D2D, #791F1F);
+    padding-right: 0.75rem;
+    box-shadow: -6px 0 20px rgba(226, 75, 74, 0.5);
+}
+
+/* Main Layout Wrapper */
+.main-wrapper {
+    max-width: 1480px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+}
+
+.card-panel {
+    background: #FFFFFF;
+    border-radius: 20px;
+    border: 1px solid #E5E5E5;
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.panel-heading {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 0.4rem;
+}
+
+.panel-subheading {
+    font-size: 0.96rem;
+    color: #4B5563;
+    margin-bottom: 1.5rem;
+}
+
+.hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #E24B4A;
+    background: #FCEBEB;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
+
+/* Alert Badges */
+.badge-alert {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.3rem 0.75rem;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.badge-alert.emergency { background: #FFEBEE; color: #D32F2F; border: 1px solid #FFCDD2; }
+.badge-alert.warning { background: #FFF8E1; color: #F9A825; border: 1px solid #FFE082; }
+.badge-alert.watch { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
+
+/* Footer */
+footer {
+    background: #111827;
+    color: #FFFFFF;
+    margin-top: 4rem;
+    padding: 3rem 1.5rem 1.5rem 1.5rem;
+}
+
+.footer-bottom {
+    max-width: 1480px;
+    margin: 0 auto;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+}

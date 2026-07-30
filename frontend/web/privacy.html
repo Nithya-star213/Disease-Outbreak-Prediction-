@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy (GDPR Compliant) - PulseWatch India</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS & Scripts -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chatbot.js"></script>
+</head>
+<body data-bot-name="PrivacyBot">
+
+    <!-- Red Vertical Floating Feedback Tab -->
+    <div class="feedback-tab" onclick="alert('Feedback recorded for Privacy Policy!')">
+        <i class="fa-solid fa-comment-dots"></i> Feedback
+    </div>
+
+    <!-- Standardized Sticky Header Navigation (Clean English Only) -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo-container">
+                <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div>
+                    <div class="logo-title">PulseWatch 🩺</div>
+                    <div class="logo-subtitle">Disease Outbreak Intelligence</div>
+                </div>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="symptom-checker.html" class="nav-link">Symptom Checker</a></li>
+                <li><a href="map.html" class="nav-link">Outbreak Map</a></li>
+                <li><a href="signals.html" class="nav-link">Live Signals Feed</a></li>
+                <li><a href="forecast.html" class="nav-link">Forecast & Trends</a></li>
+                <li><a href="about.html" class="nav-link">About & Tech</a></li>
+                <li><a href="privacy.html" class="nav-link active">Privacy Policy</a></li>
+            </ul>
+
+            <div class="header-actions">
+                <button class="btn-signout" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+
+        <section class="card-panel" style="max-width: 1000px; margin: 0 auto;">
+            <div style="border-bottom: 1px solid #E5E5E5; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                <span class="badge-alert watch">GDPR READY & ZERO-PII GUARANTEE</span>
+                <h1 class="panel-heading" style="font-size: 2.2rem; margin-top: 0.5rem;">PulseWatch Privacy Policy</h1>
+                <p style="font-size: 0.9rem; color: #6B7280;">Last Updated: July 2026 • Platform Developer: KaviyaRekha</p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; line-height: 1.7; color: #374151; font-size: 0.95rem;">
+                
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; color: #111827; margin-bottom: 0.4rem;">1. Who We Are and How to Contact Us</h3>
+                    <p>PulseWatch ("PulseWatch", "we", "our", "us") is a real-time disease outbreak intelligence platform developed by <strong>KaviyaRekha</strong>. As a public health surveillance system, we prioritize data privacy and advocate for the responsible handling of health-related data.</p>
+                    <div style="background: #FAFAFA; border: 1px solid #E5E5E5; padding: 1rem; border-radius: 12px; margin-top: 0.75rem;">
+                        <strong>Data Protection Officer (DPO):</strong> privacy@pulsewatch.io<br>
+                        <strong>General Enquiries:</strong> support@pulsewatch.io<br>
+                        <strong>Lead Developer:</strong> KaviyaRekha (S.A. Engineering College AI&DS)
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; color: #111827; margin-bottom: 0.4rem;">2. Regulatory & Clinical Status</h3>
+                    <p>PulseWatch processes publicly available data from sources such as Reddit health discussions, WHO RSS feeds, Google Trends, and NewsAPI. The platform does not collect or process patient-specific medical records or personally identifiable information (PII). PulseWatch is designed to support qualified health professionals and public health monitoring, and must not be relied upon as a substitute for professional medical judgment or diagnosis.</p>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; color: #111827; margin-bottom: 0.4rem;">3. Zero Personal Data Collection Policy</h3>
+                    <p>PulseWatch operates on a strict zero-PII architecture. We do not store user names, home addresses, phone numbers, or un-hashed IP addresses. IP addresses reaching our edge network are immediately salted and hashed via SHA-256 before any analytical logging occurs.</p>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; color: #111827; margin-bottom: 0.4rem;">4. Your Rights Under GDPR (Articles 15–22)</h3>
+                    <p>Although PulseWatch collects no PII, users retain full rights to inquire about system processing policies, request data deletion of any submitted feedback logs, or opt out of analytics cookies by contacting <strong>privacy@pulsewatch.io</strong>.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Floating Bottom-Right Scoped Chatbot Widget -->
+    <div class="chat-floating-btn" onclick="toggleChatWindow()">
+        <i class="fa-solid fa-shield-halved"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div><i class="fa-solid fa-lock" style="color: #64B5F6;"></i> PrivacyBot (GDPR Assistant)</div>
+            <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="toggleChatWindow()"></i>
+        </div>
+
+        <div class="chat-messages" id="chatThread">
+            <div class="msg-bubble msg-bot">
+                Hello! I am <strong>PrivacyBot</strong>. Ask me about GDPR compliance, zero-PII policies, or IP anonymization standards!
+            </div>
+        </div>
+
+        <div class="chat-chips">
+            <div class="chip-item" onclick="sendQuickQuery('How is my IP anonymized?')">IP Anonymization</div>
+            <div class="chip-item" onclick="sendQuickQuery('Who is the DPO contact?')">DPO Contact</div>
+            <div class="chip-item" onclick="sendQuickQuery('Is PII stored in database?')">Zero PII Policy</div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Ask PrivacyBot..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <span>© 2026 PulseWatch India. All rights reserved. S.A. Engineering College AI&DS.</span>
+            <span>GDPR Privacy Policy & PrivacyBot AI</span>
+        </div>
+    </footer>
+
+</body>
+</html>

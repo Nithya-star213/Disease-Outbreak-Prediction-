@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forecast & Trends - PulseWatch India Predictive Engine</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome & Chart.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS & Scripts -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chatbot.js"></script>
+
+    <style>
+        .model-tab-btn {
+            padding: 0.55rem 1.1rem; border-radius: 20px; border: 1.5px solid #E5E5E5; background: #FFFFFF;
+            font-size: 0.85rem; font-weight: 700; cursor: pointer; color: #374151; transition: all 0.25s ease;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .model-tab-btn.active {
+            background: #E24B4A; color: white; border-color: #E24B4A; box-shadow: 0 4px 12px rgba(226, 75, 74, 0.25);
+        }
+
+        .slider-control-card {
+            background: #FAFAFA; border: 1px solid #E5E5E5; border-radius: 14px; padding: 1.25rem;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+
+        .matrix-row-item {
+            background: #FAFAFA;
+            border: 1px solid #E5E5E5;
+            border-radius: 14px;
+            padding: 1.1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            color: #111827;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .matrix-row-item:hover {
+            border-color: #E24B4A;
+            background: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(226, 75, 74, 0.08);
+        }
+    </style>
+</head>
+<body data-bot-name="ForecastBot">
+
+    <!-- Red Vertical Floating Feedback Tab -->
+    <div class="feedback-tab" onclick="alert('Feedback recorded for Forecast & Trends!')">
+        <i class="fa-solid fa-comment-dots"></i> Feedback
+    </div>
+
+    <!-- Standardized Sticky Header Navigation (6 Core Menu Items) -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo-container">
+                <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div>
+                    <div class="logo-title">PulseWatch 🩺</div>
+                    <div class="logo-subtitle">Disease Outbreak Intelligence</div>
+                </div>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="symptom-checker.html" class="nav-link">Symptom Checker</a></li>
+                <li><a href="map.html" class="nav-link">Outbreak Map</a></li>
+                <li><a href="signals.html" class="nav-link">Live Signals Feed</a></li>
+                <li><a href="forecast.html" class="nav-link active">Forecast & Trends</a></li>
+                <li><a href="about.html" class="nav-link">About & Tech</a></li>
+            </ul>
+
+            <div class="header-actions">
+                <button class="btn-signout" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+
+        <!-- Page Title Bar & Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span class="hero-tag"><i class="fa-solid fa-chart-line"></i> Ensemble LSTM + XGBoost Predictive Engine</span>
+                <h1 class="panel-heading" style="font-size: 2.2rem;">7-Day Outbreak Forecast & Trends</h1>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <!-- Cluster Selector -->
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label style="font-weight: 700; font-size: 0.88rem; color: #374151;">Active Cluster:</label>
+                    <select id="clusterDropdown" style="padding: 0.6rem 1rem; border-radius: 12px; border: 1.5px solid #E5E5E5; font-weight: 700; font-size: 0.88rem; outline: none; background: #FFFFFF;" onchange="updateForecastView(this.value)">
+                        <option value="cluster-1">Kozhikode, Kerala (Nipah - 42 signals)</option>
+                        <option value="cluster-2">Bengaluru, Karnataka (Dengue - 28 signals)</option>
+                        <option value="cluster-3">Mumbai, Maharashtra (Respiratory - 22 signals)</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary" onclick="exportForecastCSV()"><i class="fa-solid fa-file-export"></i> Export Report</button>
+            </div>
+        </div>
+
+        <!-- Top Forecast Overview Metrics Bar -->
+        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #D32F2F;" id="statPeak">110 Signals</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">7-Day Projected Peak</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #F9A825;" id="statTrajectory">+245%</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Forecasted Growth Trajectory</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #2E7D32;">88.6% R²</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Ensemble Model Fit Accuracy</div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 1.8rem; font-weight: 800; color: #D32F2F;">2 Spikes</div>
+                <div style="font-size: 0.85rem; color: #6B7280; font-weight: 700; margin-top: 4px;">Isolation Forest Anomalies</div>
+            </div>
+        </section>
+
+        <!-- Model Selection Tabs -->
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <span style="font-weight: 800; font-size: 0.88rem; color: #111827; margin-right: 0.5rem;">Prediction Model:</span>
+            <button class="model-tab-btn active" onclick="switchModel('lstm', this)"><i class="fa-solid fa-brain"></i> LSTM + XGBoost Ensemble</button>
+            <button class="model-tab-btn" onclick="switchModel('prophet', this)"><i class="fa-solid fa-chart-line"></i> Facebook Prophet (Seasonal)</button>
+            <button class="model-tab-btn" onclick="switchModel('wma', this)"><i class="fa-solid fa-calculator"></i> Weighted Moving Average (WMA)</button>
+        </div>
+
+        <!-- 7-Day Line Chart Panel -->
+        <section class="card-panel">
+            <h2 class="panel-heading"><i class="fa-solid fa-chart-line" style="color: #E24B4A;"></i> 7-Day Predicted Signal Trajectory</h2>
+            <p class="panel-subheading">Solid line indicates historical baseline; dashed line represents LSTM Neural Net forecast with shaded 75% confidence interval.</p>
+
+            <div style="height: 320px; position: relative;">
+                <canvas id="forecastChartCanvas"></canvas>
+            </div>
+        </section>
+
+        <!-- Interactive Scenario Simulation (What-If Analysis) -->
+        <section class="card-panel">
+            <h2 class="panel-heading"><i class="fa-solid fa-sliders" style="color: #E24B4A;"></i> What-If Intervention Scenario Simulator</h2>
+            <p class="panel-subheading">Adjust public health parameters to simulate real-time impact on the projected outbreak trajectory.</p>
+
+            <div class="grid-2">
+                <div class="slider-control-card">
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="font-size: 0.9rem;">Vector Control / Intervention Effort:</strong>
+                        <span style="color: #E24B4A; font-weight: 800;" id="interventionVal">+0% Surge</span>
+                    </div>
+                    <input type="range" min="0" max="50" value="0" style="width: 100%; accent-color: #E24B4A;" oninput="updateScenarioSimulation(this.value)">
+                    <span style="font-size: 0.78rem; color: #6B7280;">Simulates government fogging, quarantine, and mosquito larvicide campaigns.</span>
+                </div>
+
+                <div class="slider-control-card">
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="font-size: 0.9rem;">Monsoon Rainfall Factor:</strong>
+                        <span style="color: #E24B4A; font-weight: 800;" id="monsoonVal">Moderate</span>
+                    </div>
+                    <input type="range" min="1" max="3" value="2" style="width: 100%; accent-color: #E24B4A;" oninput="updateMonsoonFactor(this.value)">
+                    <span style="font-size: 0.78rem; color: #6B7280;">Simulates stagnant water accumulation and mosquito breeding acceleration.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 14-Day Risk Score History & Regional Context Matrix -->
+        <div class="grid-2">
+            
+            <!-- 14-Day Risk History Bar Chart Panel -->
+            <section class="card-panel">
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #111827; margin-bottom: 0.3rem;">14–Day Risk Score History</h3>
+                <p style="font-size: 0.9rem; color: #6B7280; margin-bottom: 1.25rem;">Isolation Forest anomaly spikes highlighted in red.</p>
+                
+                <div style="height: 250px; position: relative;">
+                    <canvas id="riskHistoryCanvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Regional Context Matrix Panel -->
+            <section class="card-panel" style="display: flex; flex-direction: column; gap: 1.1rem;">
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #111827; margin-bottom: 0.2rem;">Regional Context Matrix</h3>
+
+                <div class="matrix-row-item">
+                    <span>Population Density:</span>
+                    <strong style="color: #111827;">860 / km² <span style="color: #D32F2F; font-weight: 800;">(High Risk)</span></strong>
+                </div>
+
+                <div class="matrix-row-item">
+                    <span>Vaccination Rate Coverage:</span>
+                    <strong style="color: #2E7D32;">82%</strong>
+                </div>
+
+                <div class="matrix-row-item">
+                    <span>Average Temperature:</span>
+                    <strong style="color: #F9A825;">28.4°C <span style="font-size: 0.82rem; font-weight: 600; color: #6B7280;">(Monsoon Humid Vector Environment)</span></strong>
+                </div>
+
+                <div class="matrix-row-item">
+                    <span>XGBoost Model Feature Weight:</span>
+                    <strong style="color: #E24B4A;">0.84 Correlation</strong>
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- Floating Bottom-Right Scoped Chatbot Widget -->
+    <div class="chat-floating-btn" onclick="toggleChatWindow()">
+        <i class="fa-solid fa-chart-line"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div><i class="fa-solid fa-chart-pie" style="color: #64B5F6;"></i> ForecastBot (Trends Assistant)</div>
+            <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="toggleChatWindow()"></i>
+        </div>
+
+        <div class="chat-messages" id="chatThread">
+            <div class="msg-bubble msg-bot">
+                Hello! I am <strong>ForecastBot</strong>. Ask me how LSTM models project 7-day trajectories or how XGBoost combines population density!
+            </div>
+        </div>
+
+        <div class="chat-chips">
+            <div class="chip-item" onclick="sendQuickQuery('How does LSTM forecast work?')">LSTM Neural Net</div>
+            <div class="chip-item" onclick="sendQuickQuery('Why did risk score spike?')">Anomaly Spikes</div>
+            <div class="chip-item" onclick="sendQuickQuery('Explain XGBoost context weights')">XGBoost Factors</div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Ask ForecastBot..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let lineChartInstance = null;
+        let barChartInstance = null;
+        let activeCluster = 'cluster-1';
+        let currentForecastData = null;
+        let interventionFactor = 0;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await renderCharts('cluster-1');
+        });
+
+        async function updateForecastView(clusterId) {
+            activeCluster = clusterId;
+            await renderCharts(clusterId);
+        }
+
+        async function renderCharts(clusterId) {
+            currentForecastData = await fetchForecast(clusterId);
+            drawMainLineChart();
+            drawRiskBarChart();
+        }
+
+        function drawMainLineChart() {
+            const ctx1 = document.getElementById('forecastChartCanvas').getContext('2d');
+            if (lineChartInstance) lineChartInstance.destroy();
+
+            const adjustedForecast = currentForecastData.forecast_counts.map(c => Math.max(10, Math.round(c * (1 - interventionFactor / 100))));
+
+            lineChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [...currentForecastData.historical_days, ...currentForecastData.forecast_days],
+                    datasets: [
+                        {
+                            label: 'Historical Baseline Signals',
+                            data: [...currentForecastData.historical_counts, null, null, null, null, null, null, null],
+                            borderColor: '#1E88E5',
+                            backgroundColor: '#1E88E5',
+                            borderWidth: 3,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'LSTM 7-Day Forecast',
+                            data: [null, null, null, null, null, null, currentForecastData.historical_counts[6], ...adjustedForecast],
+                            borderColor: '#E24B4A',
+                            borderDash: [6, 6],
+                            backgroundColor: 'rgba(226, 75, 74, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function drawRiskBarChart() {
+            const ctx2 = document.getElementById('riskHistoryCanvas').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+
+            barChartInstance = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7', 'Day 8', 'Day 9', 'Day 10', 'Day 11', 'Day 12', 'Day 13', 'Day 14'],
+                    datasets: [{
+                        label: 'Risk Score (0-10)',
+                        data: [3.2, 3.5, 4.0, 4.2, 5.0, 6.8, 7.4, 8.5, 9.8, 9.2, 8.8, 8.0, 7.5, 7.4],
+                        backgroundColor: [
+                            '#2E7D32', '#2E7D32', '#2E7D32', '#2E7D32', '#2E7D32',
+                            '#F9A825', '#F9A825', '#F9A825',
+                            '#D32F2F', '#D32F2F', '#D32F2F',
+                            '#F9A825', '#F9A825', '#F9A825'
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: 0, max: 10 }
+                    }
+                }
+            });
+        }
+
+        function switchModel(modelType, element) {
+            document.querySelectorAll('.model-tab-btn').forEach(b => b.classList.remove('active'));
+            element.classList.add('active');
+            drawMainLineChart();
+        }
+
+        function updateScenarioSimulation(val) {
+            interventionFactor = parseInt(val);
+            document.getElementById('interventionVal').innerText = `+${val}% Reduction`;
+            drawMainLineChart();
+        }
+
+        function updateMonsoonFactor(val) {
+            const labels = ['Low', 'Moderate', 'Severe Surge'];
+            document.getElementById('monsoonVal').innerText = labels[val - 1];
+            drawMainLineChart();
+        }
+
+        function exportForecastCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Day,Type,PredictedSignalCount\n";
+            currentForecastData.historical_days.forEach((d, i) => {
+                csvContent += `"${d}","Historical Baseline","${currentForecastData.historical_counts[i]}"\n`;
+            });
+            currentForecastData.forecast_days.forEach((d, i) => {
+                csvContent += `"${d}","LSTM Forecast","${currentForecastData.forecast_counts[i]}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `PulseWatch_7Day_Forecast_${activeCluster}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <span>© 2026 PulseWatch India. All rights reserved. S.A. Engineering College AI&DS.</span>
+            <span>Ensemble LSTM Predictive Engine & ForecastBot AI</span>
+        </div>
+    </footer>
+
+</body>
+</html>

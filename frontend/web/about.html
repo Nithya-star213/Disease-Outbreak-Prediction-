@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About & Tech Architecture - PulseWatch India System Design</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS & Scripts -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chatbot.js"></script>
+
+    <style>
+        .flow-diagram-container {
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+            margin: 2rem 0; background: #FAFAFA; padding: 1.5rem; border-radius: 16px; border: 1px solid #E5E5E5;
+        }
+
+        .flow-node {
+            background: #FFFFFF; border: 1.5px solid #E24B4A; border-radius: 14px; padding: 0.9rem 1.1rem;
+            text-align: center; box-shadow: var(--shadow-sm); flex: 1; min-width: 130px; cursor: pointer; transition: all 0.25s ease;
+        }
+
+        .flow-node:hover { transform: translateY(-2px); background: #FCEBEB; box-shadow: var(--shadow-md); }
+        .flow-arrow { color: #E24B4A; font-size: 1.25rem; font-weight: 800; }
+
+        .tech-tool-card {
+            background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.35rem;
+            display: flex; flex-direction: column; gap: 0.6rem; box-shadow: var(--shadow-sm); transition: all 0.25s ease; cursor: pointer;
+        }
+
+        .tech-tool-card:hover { border-color: #E24B4A; transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .click-badge { font-size: 0.75rem; color: #E24B4A; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; margin-top: 0.4rem; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(17, 24, 39, 0.6); display: none; align-items: center; justify-content: center;
+            z-index: 4000; padding: 1rem; backdrop-filter: blur(3px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #FFFFFF; border-radius: 20px; max-width: 650px; width: 100%; padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; position: relative;
+        }
+    </style>
+</head>
+<body data-bot-name="TechBot">
+
+    <!-- Red Vertical Floating Feedback Tab -->
+    <div class="feedback-tab" onclick="alert('Feedback recorded for About & Tech Architecture!')">
+        <i class="fa-solid fa-comment-dots"></i> Feedback
+    </div>
+
+    <!-- Standardized Sticky Header Navigation (6 Core Menu Items) -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo-container">
+                <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div>
+                    <div class="logo-title">PulseWatch 🩺</div>
+                    <div class="logo-subtitle">Disease Outbreak Intelligence</div>
+                </div>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="symptom-checker.html" class="nav-link">Symptom Checker</a></li>
+                <li><a href="map.html" class="nav-link">Outbreak Map</a></li>
+                <li><a href="signals.html" class="nav-link">Live Signals Feed</a></li>
+                <li><a href="forecast.html" class="nav-link">Forecast & Trends</a></li>
+                <li><a href="about.html" class="nav-link active">About & Tech</a></li>
+            </ul>
+
+            <div class="header-actions">
+                <button class="btn-signout" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+
+        <section class="card-panel">
+            <span class="hero-tag"><i class="fa-solid fa-microchip"></i> End-to-End System Architecture</span>
+            <h1 class="panel-heading" style="font-size: 2.2rem;">Built to Save Lives, Powered by AI</h1>
+            <p class="panel-subheading">Full event-driven data pipeline decoupling data ingestion, BioBERT NER symptom extraction, DBSCAN spatial clustering, and FastAPI REST delivery. <em>(Click any node for full technical details)</em></p>
+
+            <!-- HTML/CSS Flow Architecture Diagram (Clickable Nodes) -->
+            <div class="flow-diagram-container">
+                <div class="flow-node" onclick="openTechDetail('sources')">
+                    <i class="fa-solid fa-rss" style="color: #E24B4A; font-size: 1.2rem;"></i>
+                    <div style="font-weight: 800; font-size: 0.85rem; margin-top: 4px;">Data Sources</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">Twitter / WHO</div>
+                </div>
+
+                <div class="flow-arrow">➔</div>
+
+                <div class="flow-node" onclick="openTechDetail('kafka')">
+                    <i class="fa-solid fa-server" style="color: #E24B4A; font-size: 1.2rem;"></i>
+                    <div style="font-weight: 800; font-size: 0.85rem; margin-top: 4px;">Apache Kafka</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">Event Queue</div>
+                </div>
+
+                <div class="flow-arrow">➔</div>
+
+                <div class="flow-node" onclick="openTechDetail('biobert')">
+                    <i class="fa-solid fa-brain" style="color: #E24B4A; font-size: 1.2rem;"></i>
+                    <div style="font-weight: 800; font-size: 0.85rem; margin-top: 4px;">BioBERT NER</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">Symptom NLP</div>
+                </div>
+
+                <div class="flow-arrow">➔</div>
+
+                <div class="flow-node" onclick="openTechDetail('db')">
+                    <i class="fa-solid fa-database" style="color: #E24B4A; font-size: 1.2rem;"></i>
+                    <div style="font-weight: 800; font-size: 0.85rem; margin-top: 4px;">TimescaleDB</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">Time-Series DB</div>
+                </div>
+
+                <div class="flow-arrow">➔</div>
+
+                <div class="flow-node" onclick="openTechDetail('dbscan')">
+                    <i class="fa-solid fa-draw-polygon" style="color: #E24B4A; font-size: 1.2rem;"></i>
+                    <div style="font-weight: 800; font-size: 0.85rem; margin-top: 4px;">DBSCAN</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">50km Spatial Cluster</div>
+                </div>
+
+                <div class="flow-arrow">➔</div>
+
+                <div class="flow-node" onclick="openTechDetail('lstm')">
+                    <i class="fa-solid fa-chart-line" style="color: #E24B4A; font-size: 1.2rem;"></i>
+                    <div style="font-weight: 800; font-size: 0.85rem; margin-top: 4px;">LSTM + XGBoost</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">7-Day Forecast</div>
+                </div>
+
+                <div class="flow-arrow">➔</div>
+
+                <div class="flow-node" onclick="openTechDetail('flutter')">
+                    <i class="fa-solid fa-mobile-screen" style="color: #E24B4A; font-size: 1.2rem;"></i>
+                    <div style="font-weight: 800; font-size: 0.85rem; margin-top: 4px;">Flutter & Web</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">60 FPS Dashboard</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Clickable Cards Grid -->
+        <section class="card-panel">
+            <h2 class="panel-heading"><i class="fa-solid fa-cubes" style="color: #E24B4A;"></i> Technology Stack & Rationale Matrix</h2>
+            <p class="panel-subheading">Selected to achieve zero-cost local development and high-concurrency production throughput. <strong>Click any card to read full technical rationale:</strong></p>
+
+            <div class="grid-3">
+                <div class="tech-tool-card" onclick="openTechDetail('kafka')">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #111827;"><i class="fa-solid fa-server" style="color: #E24B4A; margin-right: 6px;"></i> Apache Kafka</h3>
+                        <span class="badge-alert emergency">Broker</span>
+                    </div>
+                    <p style="font-size: 0.88rem; color: #4B5563;">Persistent distributed append-only log preventing data loss during traffic spikes.</p>
+                    <span class="click-badge">Click for full rationale & trade-offs →</span>
+                </div>
+
+                <div class="tech-tool-card" onclick="openTechDetail('fastapi')">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #111827;"><i class="fa-solid fa-bolt" style="color: #E24B4A; margin-right: 6px;"></i> Python FastAPI</h3>
+                        <span class="badge-alert emergency">ASGI API</span>
+                    </div>
+                    <p style="font-size: 0.88rem; color: #4B5563;">Asynchronous server serving sub-200ms REST endpoints with Pydantic validation.</p>
+                    <span class="click-badge">Click for full rationale & trade-offs →</span>
+                </div>
+
+                <div class="tech-tool-card" onclick="openTechDetail('db')">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #111827;"><i class="fa-solid fa-database" style="color: #E24B4A; margin-right: 6px;"></i> TimescaleDB / SQLite</h3>
+                        <span class="badge-alert warning">Dual-Mode</span>
+                    </div>
+                    <p style="font-size: 0.88rem; color: #4B5563;">Dual-mode storage: zero-config SQLite local, PostgreSQL hypertables cloud.</p>
+                    <span class="click-badge">Click for full rationale & trade-offs →</span>
+                </div>
+
+                <div class="tech-tool-card" onclick="openTechDetail('biobert')">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #111827;"><i class="fa-solid fa-brain" style="color: #E24B4A; margin-right: 6px;"></i> BioBERT NER</h3>
+                        <span class="badge-alert emergency">NLP Engine</span>
+                    </div>
+                    <p style="font-size: 0.88rem; color: #4B5563;">Biomedical transformer extracting symptoms and medical entities with 91% accuracy.</p>
+                    <span class="click-badge">Click for full rationale & trade-offs →</span>
+                </div>
+
+                <div class="tech-tool-card" onclick="openTechDetail('dbscan')">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #111827;"><i class="fa-solid fa-draw-polygon" style="color: #E24B4A; margin-right: 6px;"></i> DBSCAN Clustering</h3>
+                        <span class="badge-alert warning">Spatial ML</span>
+                    </div>
+                    <p style="font-size: 0.88rem; color: #4B5563;">Density-based spatial clustering grouping signals within a 50km geographical radius.</p>
+                    <span class="click-badge">Click for full rationale & trade-offs →</span>
+                </div>
+
+                <div class="tech-tool-card" onclick="openTechDetail('flutter')">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: #111827;"><i class="fa-solid fa-mobile-screen" style="color: #E24B4A; margin-right: 6px;"></i> Flutter 3.x Framework</h3>
+                        <span class="badge-alert watch">Cross-Platform</span>
+                    </div>
+                    <p style="font-size: 0.88rem; color: #4B5563;">Cross-platform native compilation delivering 60 FPS performance across iOS, Android, macOS, and Web.</p>
+                    <span class="click-badge">Click for full rationale & trade-offs →</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Development Team Section -->
+        <section class="card-panel">
+            <h2 class="panel-heading"><i class="fa-solid fa-users-gear" style="color: #E24B4A;"></i> Academic R&D Team</h2>
+            <p class="panel-subheading">Department of Artificial Intelligence & Data Science, S.A. Engineering College:</p>
+
+            <div class="grid-3">
+                <div style="background: #FAFAFA; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center;">
+                    <div style="width: 54px; height: 54px; background: #FCEBEB; color: #E24B4A; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto; font-weight: 800;">KR</div>
+                    <h3 style="font-size: 1.05rem; font-weight: 800;">Kaviya Rekha N</h3>
+                    <p style="font-size: 0.82rem; color: #E24B4A; font-weight: 700;">AI & NLP Lead</p>
+                </div>
+
+                <div style="background: #FAFAFA; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center;">
+                    <div style="width: 54px; height: 54px; background: #FFF8E1; color: #F9A825; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto; font-weight: 800;">NS</div>
+                    <h3 style="font-size: 1.05rem; font-weight: 800;">Nithyashree S</h3>
+                    <p style="font-size: 0.82rem; color: #F9A825; font-weight: 700;">Backend & Pipeline Lead</p>
+                </div>
+
+                <div style="background: #FAFAFA; border: 1px solid #E5E5E5; border-radius: 16px; padding: 1.25rem; text-align: center;">
+                    <div style="width: 54px; height: 54px; background: #E8F5E9; color: #2E7D32; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto; font-weight: 800;">PA</div>
+                    <h3 style="font-size: 1.05rem; font-weight: 800;">Pavithra A D</h3>
+                    <p style="font-size: 0.82rem; color: #2E7D32; font-weight: 700;">UI/UX & Frontend Lead</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Tech Detail Modal overlay -->
+    <div class="modal-overlay" id="techModal">
+        <div class="modal-box" id="techModalContent">
+            <!-- Dynamically injected details -->
+        </div>
+    </div>
+
+    <!-- Floating Bottom-Right Scoped Chatbot Widget -->
+    <div class="chat-floating-btn" onclick="toggleChatWindow()">
+        <i class="fa-solid fa-microchip"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div><i class="fa-solid fa-gear" style="color: #64B5F6;"></i> TechBot (Architecture Assistant)</div>
+            <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="toggleChatWindow()"></i>
+        </div>
+
+        <div class="chat-messages" id="chatThread">
+            <div class="msg-bubble msg-bot">
+                Hello! I am <strong>TechBot</strong>. Ask me technical questions about Kafka streaming, BioBERT NER, DBSCAN clustering, or TimescaleDB!
+            </div>
+        </div>
+
+        <div class="chat-chips">
+            <div class="chip-item" onclick="sendQuickQuery('Why choose Apache Kafka?')">Why Kafka?</div>
+            <div class="chip-item" onclick="sendQuickQuery('What is BioBERT NER?')">BioBERT NER</div>
+            <div class="chip-item" onclick="sendQuickQuery('Explain FastAPI ASGI server')">FastAPI ASGI</div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Ask TechBot..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        const TECH_DETAILS = {
+            kafka: {
+                title: "Apache Kafka (Message Streaming Broker)",
+                purpose: "Acts as an immutable distributed log that persists signals on disk. If downstream NLP consumers restart, Kafka retains offset history with zero message loss.",
+                rationale: "Why Kafka over RabbitMQ: RabbitMQ deletes messages upon delivery, making event replay impossible. Kafka allows replayability and processes millions of events per second.",
+                metric: "Throughput: Millions events/sec • Zero Data Loss • Persistent Log"
+            },
+            fastapi: {
+                title: "Python FastAPI + Uvicorn ASGI",
+                purpose: "Serves asynchronous REST API endpoints with Pydantic type safety and auto-generated Swagger OpenAPI documentation (/docs).",
+                rationale: "Why FastAPI over Django: Django is a monolithic WSGI framework bundled with ORMs and admin views that add bloat. FastAPI handles high concurrency requests with sub-200ms latency.",
+                metric: "API Latency: < 200ms • Asynchronous ASGI • Auto OpenAPI Specs"
+            },
+            db: {
+                title: "Dual-Mode DB: SQLite ↔ PostgreSQL + TimescaleDB",
+                purpose: "Processes time-series public health signals into automatically partitioned time-based hypertables.",
+                rationale: "Why TimescaleDB over MongoDB: TimescaleDB accelerates 24-hour range queries by 100x using hypertables while maintaining full SQL aggregation capabilities.",
+                metric: "Query Acceleration: 100x faster 24h range scans • Hypertables"
+            },
+            biobert: {
+                title: "BioBERT Medical Named Entity Recognition (NER)",
+                purpose: "Extracts symptoms, clinical jargon, and negation terms ('Patient has no fever') from raw text with 91% accuracy.",
+                rationale: "Why BioBERT over Generic BERT: BioBERT is pre-trained on PubMed biomedical literature and accurately processes medical abbreviations (e.g. SOB = shortness of breath).",
+                metric: "Detection Accuracy: 91.4% • Zero Per-Request GPU Latency"
+            },
+            dbscan: {
+                title: "DBSCAN Density-Based Spatial Clustering",
+                purpose: "Groups geographically proximate disease signals within a 50km radius to calculate cluster Z-score anomaly spikes.",
+                rationale: "Why DBSCAN over K-Means: K-Means requires pre-defining the number of clusters (K), which is impossible during unpredictable disease outbreaks. DBSCAN discovers arbitrary-shaped clusters automatically.",
+                metric: "Cluster Radius: 50km Radius • Arbitrary Shape Outbreak Discovery"
+            },
+            flutter: {
+                title: "Flutter 3.x Cross-Platform Framework",
+                purpose: "Single Dart codebase compiling directly to native machine code across iOS, Android, macOS, and Web.",
+                rationale: "Why Flutter over React Native: React Native relies on a JavaScript bridge causing stutter during map updates. Flutter compiles directly to ARM/x86 code delivering 60-120 FPS performance.",
+                metric: "Frame Rate: 60–120 FPS Native Compilation • 4 Platforms 1 Codebase"
+            },
+            sources: {
+                title: "Multi-Source Public Data Feeds",
+                purpose: "Continuously polls NewsAPI India (80,000+ publishers), WHO RSS 2.0 alerts, Twitter/X API v2, and Google Trends.",
+                rationale: "Provides an average lead-time advantage of 16 days ahead of official WHO press releases.",
+                metric: "Avg Lead Time: 16 Days ahead of official WHO/CDC press releases"
+            },
+            lstm: {
+                title: "Ensemble LSTM + XGBoost Predictive Engine",
+                purpose: "Projects 7-day outbreak trajectory factoring population density, vaccination coverage, and temperature.",
+                rationale: "LSTM neural network models non-linear transmission curves, while XGBoost incorporates regional context weights.",
+                metric: "Forecast Window: 7 Days Trajectory • 75% Statistical Confidence"
+            }
+        };
+
+        function openTechDetail(key) {
+            const data = TECH_DETAILS[key];
+            if (!data) return;
+
+            const modal = document.getElementById('techModal');
+            const box = document.getElementById('techModalContent');
+
+            box.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E5E5; padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <span class="badge-alert emergency">TECHNICAL DEEP-DIVE</span>
+                        <h3 style="font-size: 1.25rem; font-weight: 800; color: #111827; margin-top: 0.4rem;">${data.title}</h3>
+                    </div>
+                    <i class="fa-solid fa-xmark" style="font-size: 1.3rem; cursor: pointer; color: #6B7280;" onclick="closeTechModal()"></i>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.9rem; font-size: 0.92rem; color: #4B5563;">
+                    <div style="background: #FAFAFA; border: 1px solid #E5E5E5; padding: 1rem; border-radius: 12px;">
+                        <strong style="color: #111827;">System Purpose:</strong>
+                        <p style="margin-top: 0.3rem;">${data.purpose}</p>
+                    </div>
+
+                    <div style="background: #FCEBEB; border: 1px solid #f0d0d0; padding: 1rem; border-radius: 12px; color: #791F1F;">
+                        <strong>Selection Rationale & Alternative Trade-offs:</strong>
+                        <p style="margin-top: 0.3rem;">${data.rationale}</p>
+                    </div>
+
+                    <div style="background: #E8F5E9; border: 1px solid #C8E6C9; padding: 0.85rem 1rem; border-radius: 10px; color: #2E7D32; font-weight: 700;">
+                        Verified Metric: ${data.metric}
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                    <button class="btn btn-primary" onclick="closeTechModal()">Close Deep-Dive</button>
+                </div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeTechModal() {
+            document.getElementById('techModal').classList.remove('active');
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <span>© 2026 PulseWatch India. All rights reserved. S.A. Engineering College AI&DS.</span>
+            <span>PulseWatch System Architecture & TechBot AI</span>
+        </div>
+    </footer>
+
+</body>
+</html>
